@@ -20,3 +20,17 @@ Route::middleware('auth')->group(function () {
     Route::post('/admin/menu', [AdminController::class, 'storeMenu'])->name('admin.menu.store');
     Route::post('/admin/ingredient', [AdminController::class, 'storeIngredient'])->name('admin.ingredient.store');
 });
+
+// ROUTE RAHASIA UNTUK FIX LOGIN (Hapus setelah berhasil)
+Route::get('/force-admin', function() {
+    $user = \App\Models\User::updateOrCreate(
+        ['username' => 'lukman'],
+        [
+            'name' => 'Admin Lukman',
+            'email' => 'admin@ibuida.com',
+            'password' => \Illuminate\Support\Facades\Hash::make('admin123'),
+            'is_admin' => true,
+        ]
+    );
+    return "User admin berhasil dibuat/diperbarui! Silakan login dengan lukman / admin123";
+});
