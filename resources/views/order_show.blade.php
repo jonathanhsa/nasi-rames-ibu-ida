@@ -120,7 +120,7 @@
 
         @php
             $wa_text = "Halo Ibu Ida, saya " . $order->customer_name . " ingin konfirmasi pesanan (Order ID: #" . str_pad($order->id, 5, '0', STR_PAD_LEFT) . ") dengan total Rp " . number_format($order->total_price, 0, ',', '.') . ". Terima kasih.";
-            $wa_url = "https://wa.me/6289539821084?text=" . urlencode($wa_text);
+            $wa_url = "https://wa.me/62895359821084?text=" . urlencode($wa_text);
         @endphp
         
         <a href="{{ $wa_url }}" target="_blank" class="wa-btn">Konfirmasi via WhatsApp</a>
