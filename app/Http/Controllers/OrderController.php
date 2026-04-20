@@ -17,6 +17,12 @@ class OrderController extends Controller
         return view('welcome', compact('menus'));
     }
 
+    public function menu()
+    {
+        $menus = Menu::all();
+        return view('menu', compact('menus'));
+    }
+
     public function store(Request $request)
     {
         $request->validate([

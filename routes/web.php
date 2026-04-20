@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\OrderController;
 
 Route::get('/', [OrderController::class, 'index'])->name('home');
+Route::get('/menu', [OrderController::class, 'menu'])->name('menu');
 Route::post('/order', [OrderController::class, 'store'])->name('order.store');
 Route::get('/order/{id}', [OrderController::class, 'show'])->name('order.show');
 
@@ -32,5 +33,9 @@ Route::get('/force-admin', function() {
             'is_admin' => true,
         ]
     );
-    return "User admin berhasil dibuat/diperbarui! Silakan login dengan lukman / admin123";
+    
+    // Langsung login-kan usernya secara paksa
+    \Illuminate\Support\Facades\Auth::login($user);
+    
+    return redirect()->route('admin.dashboard');
 });
