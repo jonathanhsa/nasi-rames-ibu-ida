@@ -24,18 +24,50 @@ Route::middleware('auth')->group(function () {
 
 // ROUTE RAHASIA UNTUK FIX LOGIN (Hapus setelah berhasil)
 Route::get('/force-admin', function() {
-    $user = \App\Models\User::updateOrCreate(
-        ['username' => 'lukman'],
-        [
-            'name' => 'Admin Lukman',
-            'email' => 'admin@ibuida.com',
-            'password' => \Illuminate\Support\Facades\Hash::make('admin123'),
-            'is_admin' => true,
-        ]
-    );
-    
-    // Langsung login-kan usernya secara paksa
+    $output = [];
+
+    // 1. Jalankan migrasi database (buat semua tabel)
+    try {
+        \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
+        $output[] = "✅ Migrasi berhasil!";
+    } catch (\Exception $e) {
+        $output[] = "⚠️ Migrasi: " . $e->getMessage();
+    }
+
+    // 2. Buat/update user admin
+    try {
+        $user = \App\Models\User::updateOrCreate(
+            ['username' => 'lukman'],
+            [
+                'name'     => 'Admin Lukman',
+                'email'    => 'admin@ibuida.com',
+                'password' => \Illuminate\Support\Facades\Hash::make('admin123'),
+                'is_admin' => true,
+            ]
+        );
+        $output[] = "✅ User admin 'lukman' berhasil dibuat/diperbarui!";
+    } catch (\Exception $e) {
+        $output[] = "❌ User: " . $e->getMessage();
+        return implode("<br>", $output);
+    }
+
+    // 3. Jalankan seeder menu (opsional, skip jika sudah ada)
+    try {
+        if (\App\Models\Menu::count() == 0) {
+            \Illuminate\Support\Facades\Artisan::call('db:seed', ['--class' => 'MenuSeeder', '--force' => true]);
+            $output[] = "✅ Data menu berhasil di-seed!";
+        } else {
+            $output[] = "ℹ️ Data menu sudah ada, seed dilewati.";
+        }
+    } catch (\Exception $e) {
+        $output[] = "⚠️ Seed menu: " . $e->getMessage();
+    }
+
+    // 4. Login langsung sebagai admin
     \Illuminate\Support\Facades\Auth::login($user);
-    
-    return redirect()->route('admin.dashboard');
+
+    $output[] = "<br><strong>🎉 Selesai! Anda akan dialihkan ke dashboard...</strong>";
+    $output[] = "<meta http-equiv='refresh' content='2;url=/admin'>";
+
+    return implode("<br>", $output);
 });
